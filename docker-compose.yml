@@ -1,0 +1,37 @@
+version: '3.5'
+
+services:
+  server-pool:
+    container_name: SP
+    build:
+      context: Server-Pool
+    expose:
+      - 8080
+    networks:
+      - internet
+
+  load-balancer:
+    container_name: LB
+    build:
+      context: Load-Balancer
+    ports:
+      - 8080
+    networks:
+      - internet
+    depends_on:
+      - server-pool
+
+  request-spawner:
+    container_name: RS
+    build:
+      context: Request-Spawner
+    expose:
+      - 8080
+    networks:
+      - internet
+    depends_on:
+      - load-balancer
+
+networks:
+  internet:
+    driver: bridge
