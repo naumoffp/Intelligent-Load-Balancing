@@ -10,12 +10,18 @@ Usage is shown in the test/test_queue_wrapper.py file.
 """
 
 import logging
+import os
 
 import boto3
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
 sqs = boto3.resource('sqs')
+
+
+def get_url(tag):
+    prefix = os.environ["SQS_PREFIX"]
+    return prefix + os.environ[tag]
 
 
 def create_queue(name, attributes=None):
@@ -95,54 +101,3 @@ def remove_queue(queue):
     except ClientError as error:
         logger.exception("Couldn't delete queue with URL=%s!", queue.url)
         raise error
-
-
-def usage_demo():
-    """Shows how to create, list, and delete queues."""
-    print('-'*88)
-    print("Welcome to the Amazon Simple Queue Service (Amazon SQS) demo!")
-    print('-'*88)
-
-    prefix = 'sqs-usage-demo-'
-    river_queue = create_queue(
-        prefix + 'peculiar-river',
-        {
-            'MaximumMessageSize': str(1024),
-            'ReceiveMessageWaitTimeSeconds': str(20)
-        }
-    )
-    print(f"Created queue with URL: {river_queue.url}.")
-
-    lake_queue = create_queue(
-        prefix + 'strange-lake.fifo',
-        {
-            'MaximumMessageSize': str(4096),
-            'ReceiveMessageWaitTimeSeconds': str(10),
-            'VisibilityTimeout': str(300),
-            'FifoQueue': str(True),
-            'ContentBasedDeduplication': str(True)
-        }
-    )
-    print(f"Created queue with URL: {lake_queue.url}.")
-
-    stream_queue = create_queue(prefix + 'boring-stream')
-    print(f"Created queue with URL: {stream_queue.url}.")
-
-    alias_queue = get_queue(prefix + 'peculiar-river')
-    print(f"Got queue with URL: {alias_queue.url}.")
-
-    remove_queue(stream_queue)
-    print(f"Removed queue with URL: {stream_queue.url}.", )
-
-    queues = get_queues(prefix=prefix)
-    print(f"Got {len(queues)} queues.")
-    for queue in queues:
-        remove_queue(queue)
-        print(f"Removed queue with URL: {queue.url}.")
-
-    print("Thanks for watching!")
-    print('-'*88)
-
-
-if __name__ == '__main__':
-    usage_demo()
