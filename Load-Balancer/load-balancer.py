@@ -1,11 +1,10 @@
-import pubsub
+class Server(object):
+    def __init__(self):
+        pass
 
-def logic():
-    print("This is the load balancer")
 
 def main():
-    pubsub.usage_demo()
-
+    print("This is the load balancer")
 
 if __name__ == "__main__":
     main()

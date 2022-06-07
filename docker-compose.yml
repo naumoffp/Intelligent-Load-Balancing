@@ -1,52 +1,45 @@
 version: '3.5'
 
+x-common-variables: &aws-config
+   AWS_DEFAULT_REGION: us-west-2
+   AWS_CONFIG_FILE: /root/.aws/config
+   SQS_PREFIX: ilb-
+   SERVER_POOL_SNS: server-pool
+   LOAD_BALANCER_SNS: load-balancer
+   REQUEST_SPAWNER_SNS: request-spawner
+   PRODUCTION: "True"
+
 services:
   server-pool:
     container_name: ServerPool
     build:
       context: Server-Pool
-    expose:
-      - 8080
-    networks:
-      - internet
-    environment:
-      - AWS_DEFAULT_REGION=us-west-2
-      - AWS_CONFIG_FILE=/root/.aws/config
+    stdin_open: true
+    tty: true
+    environment: *aws-config
     volumes:
       - $HOME/.aws/credentials:/root/.aws/config:ro
-
-  load-balancer:
-    container_name: LoadBalancer
-    build:
-      context: Load-Balancer
-    ports:
-      - 8080
-    networks:
-      - internet
-    environment:
-      - AWS_DEFAULT_REGION=us-west-2
-      - AWS_CONFIG_FILE=/root/.aws/config
-    volumes:
-      - $HOME/.aws/credentials:/root/.aws/config:ro
-    depends_on:
-      - server-pool
 
   request-spawner:
     container_name: RequestSpawner
     build:
       context: Request-Spawner
-    expose:
-      - 8080
-    networks:
-      - internet
-    environment:
-      - AWS_DEFAULT_REGION=us-west-2
-      - AWS_CONFIG_FILE=/root/.aws/config
+    stdin_open: true
+    tty: true
+    environment: *aws-config
     volumes:
       - $HOME/.aws/credentials:/root/.aws/config:ro
     depends_on:
-      - load-balancer
+      - server-pool
 
-networks:
-  internet:
-    driver: bridge
+  load-balancer:
+    container_name: LoadBalancer
+    build:
+      context: Load-Balancer
+    stdin_open: true
+    tty: true
+    environment: *aws-config
+    volumes:
+      - $HOME/.aws/credentials:/root/.aws/config:ro
+    depends_on:
+      - request-spawner
