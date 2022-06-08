@@ -38,13 +38,6 @@ def get_queues(prefix=None):
 
 
 def remove_queue(queue):
-    """
-    Removes an SQS queue. When run against an AWS account, it can take up to
-    60 seconds before the queue is actually deleted.
-
-    :param queue: The queue to delete.
-    :return: None
-    """
     try:
         queue.delete()
         logger.info("Deleted queue with URL=%s.", queue.url)
