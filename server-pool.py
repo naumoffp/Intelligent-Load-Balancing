@@ -1,11 +1,13 @@
 import random
 import time
 import math
+import re
 
 
 # TODO: Make it so that the server and IP registries are synced across containers
 class Server(object):
     def __init__(self, locale):
+        self.name = None
         self.locale = self.query_locale(locale)
         self.response_time = self.query_hardware()
 
@@ -29,7 +31,7 @@ class Server(object):
 
     def query_hardware(self):
         # Measured in milliseconds
-        return random.randint(200, 2000)
+        return random.randint(200, 600)
 
     def query_server(self, ip):
         # Measured in milliseconds
@@ -68,23 +70,67 @@ class Server(object):
             # See https://serverfault.com/questions/143804/network-latency-how-long-does-it-take-for-a-packet-to-travel-halfway-around-t
             inefficiency += 100
 
-
         # Cooling fans at work
         self.load = max(0, self.load - 25)
+        inefficiency += self.load
 
         server_response = self.response_time + inefficiency
 
         return server_response
 
+    def info(self):
+        print("Name: " + str(self.name))
+        print("Locale: " + str(self.locale))
+        print("Response Time: " + str(self.response_time))
+        print("Load: " + str(self.load))
+        print("Last Request (UTC): " + str(self.last_request))
+        print("-"*88)
 
+
+ # TODO: Make it so that the server and IP registries are synced across containers
 class ServerCluster(object):
+
     def __init__(self):
-        pass
+        self.cluster = {
+            "Africa (AF)": list(),
+            "Antarctica (AN)": list(),
+            "Asia (AS)": list(),
+            "Europe (EU)": list(),
+            "North America (NA)": list(),
+            "Oceania (OC)": list(),
+            "South America (SA)": list()
+        }
+
+    def query_cluster(self, locale):
+        return self.cluster[locale]
+
+    def add_servers(self, locale, amount):
+        # Create each new server, attatch a name, then append it to the cluster
+        for n in range(amount):
+            name = locale[-4:] + "-" + str(n+1)
+            # Remove parentheses from the string
+            name = re.sub('[()]', '', name)
+            new_server = Server(locale)
+            new_server.name = name
+
+            self.cluster[locale].append(new_server)
+
 
 def main():
-    x = Server("North America (NA)")
-    while (True):
-        print(x.query_server("50.123.45.678"))
+    x = ServerCluster()
+    x.add_servers("North America (NA)", 3)
+    x.add_servers("Europe (EU)", 3)
+
+    na = x.query_cluster("North America (NA)")
+    eu = x.query_cluster("Europe (EU)")
+
+    for z in na:
+        z.info()
+
+    for g in eu:
+        g.info()
+
+
 
 
 if __name__ == "__main__":
