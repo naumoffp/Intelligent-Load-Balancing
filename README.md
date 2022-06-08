@@ -5,5 +5,7 @@ To run the simulation, install and configure `awscli` first. This project requir
 
 
 Load Balancer <-- Request Spawner
+
 Load Balancer --> Server Pool
+
 Load Balancer <-- Server Pool
