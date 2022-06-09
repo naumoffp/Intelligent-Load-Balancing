@@ -13,6 +13,23 @@ def get_url(tag):
     return prefix + os.environ[tag]
 
 
+def create_queue(name, attributes=None):
+    if not attributes:
+        attributes = {}
+
+    try:
+        queue = sqs.create_queue(
+            QueueName=name,
+            Attributes=attributes
+        )
+        logger.info("Created queue '%s' with URL=%s", name, queue.url)
+    except ClientError as error:
+        logger.exception("Couldn't create queue named '%s'.", name)
+        raise error
+    else:
+        return queue
+
+
 def get_queue(name):
     try:
         queue = sqs.get_queue_by_name(QueueName=name)

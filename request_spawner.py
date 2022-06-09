@@ -6,6 +6,7 @@ import numpy as np
 from numpy.random import multinomial
 
 import sqs
+import os
 
 
 class IPRegistry(object):
@@ -108,7 +109,6 @@ def init_queue():
     # TODO: Add error handling
     server_pool     = "ilb-server-pool"
     load_balancer   = "ilb-load-balancer"
-    group_id = "ILBRS"
 
     request_spawner = "ilb-request-spawner"
     request_spawner_tag = request_spawner + ".fifo"
@@ -142,9 +142,10 @@ def main():
 
 
     ip_spawner = IPBatch()
-    batch_routine = [1, 2, 3]
+    batch_routine = [10000]
 
     spawner_queue = init_queue()
+    group_id = "ILBRS"
 
     while (True):
         user_input = input("Press Enter to send a batch of web traffic!")
@@ -153,9 +154,10 @@ def main():
 
         for x in batch_routine:
             batch = ip_spawner.generate_batch(x)
-            spawner_q.send_message(MessageBody=json.dumps(batch), MessageGroupId=group_id)
+            spawner_queue.send_message(MessageBody=json.dumps(batch), MessageGroupId=group_id)
 
-    if os.environ["PRODUCTION", False]:
+    # If production is not specified the default assumption will be false
+    if os.environ.get("PRODUCTION", False):
         shutdown_queue()
 
 
