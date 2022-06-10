@@ -1,7 +1,7 @@
-import random
-import time
 import math
+import random
 import re
+import time
 from itertools import cycle
 
 

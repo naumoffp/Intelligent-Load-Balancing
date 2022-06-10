@@ -1,5 +1,5 @@
-import os
 import csv
+import os
 
 
 # See https://stackoverflow.com/questions/17984809/how-do-i-create-an-incrementing-filename-in-python
