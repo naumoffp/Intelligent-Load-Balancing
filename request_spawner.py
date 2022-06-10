@@ -1,4 +1,5 @@
 import json
+import os
 import random
 import time
 
@@ -6,14 +7,12 @@ import numpy as np
 from numpy.random import multinomial
 
 import sqs
-import os
 
 
 class IPRegistry(object):
     def __init__(self):
         self.definitions = None
         self.build_definitions()
-
 
     def query(self, ip):
         # The first two numbers in an IP address in this registry indicate what continent it is orginating from

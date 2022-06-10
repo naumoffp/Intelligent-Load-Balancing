@@ -2,19 +2,14 @@ import json
 import logging
 import os
 from itertools import cycle
-import file_helpers
 
+import file_helpers
 import server_pool
 import sqs
-
 
 RR_TIME = 0
 RR_OVERLOAD = 0
 RR_ITERATORS = None
-
-ML_TIME = 0
-ML_OVERLOAD = 0
-
 
 def round_robin(incoming, cluster):
     print("Processing incoming web requests with round robin algorithm...\n")
@@ -27,7 +22,7 @@ def round_robin(incoming, cluster):
     # TODO: Make feature selection consistent across containers
     # TODO: Make server response time correlate with its ability to handle server loads
     server_attr = ["Server-Locale", "Server-Response-Time", "Server-Current-Load"]
-    misc_attr = ["IP-Locale",  "Last-Request-Time-Delta", "Overloaded"]
+    misc_attr = ["Last-Request-Time-Delta", "Overloaded"]
     features = [*server_attr] + [*misc_attr]
 
     # TODO: Have this be generated from a file
@@ -70,7 +65,8 @@ def round_robin(incoming, cluster):
 
         # Add the remaining features to the server info
         server_info["Overloaded"] = is_overloaded
-        server_info["IP-Locale"] = locale_name
+        # TODO: Implement this feature
+        # server_info["IP-Locale"] = locale_name
 
         training_data.append(server_info)
 
