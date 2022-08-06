@@ -76,7 +76,7 @@ def round_robin(incoming, cluster):
     print("Writing the training data...")
 
     # Write training data to csv
-    file_pattern = "training_data/batch_%s.csv"
+    file_pattern = "Data/batch_%s.csv"
 
     file_helpers.write_training_data(file_pattern, features, training_data)
 

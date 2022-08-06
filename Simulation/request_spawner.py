@@ -141,7 +141,7 @@ def main():
 
 
     ip_spawner = IPBatch()
-    batch_routine = [10000]
+    batch_routine = [1000]
 
     spawner_queue = init_queue()
     group_id = "ILBRS"
